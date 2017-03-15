@@ -5,6 +5,7 @@ vers. 0.1
 Sistema di analisi dei log delle mail.
 
 Il sistema analizza un file di log di Postfix. Adattabile sicuramente anche ad altri sistemi di mail.
+permette una analisi di dettaglio e uno zoom sulla singola mail, non si limita a statistiche generali del file di log.
 
 
 Il software è scritto in PHP, è in versione 0.1 è mooooolto rudimentale, dato che utilizza non solo PHP,
@@ -57,4 +58,15 @@ Il meccanismo di base è il seguente:
 
 Sono graditi solo suggerimenti intelligenti.
 Se sono richieste spiegazioni o modifiche provate a conttatarmi.. se mi sarà possibile vi aiutero' volentieri..
+
+
+TODO
+la lista e' lunga, per prima cosa capire se l'associazione linee / mail / connessioni puo' essere migliorata
+quindi aumentare la ricerca e di conseguenza anche la stampa alle connessioni
+quindi inserire la fase di analisi dei messaggi di sistema
+per file troppo lunghi il server non riesce ad analizzare il tutto perche' i dati sono in memoria.. appoggiarsi a file o DB.
+milgiorare le statistiche..
+altro che viene in mente...
+
+
 

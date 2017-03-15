@@ -18,8 +18,8 @@ define ( "CNTO" , 31 );
 define ( "NOERR" , 40 );
 define ( "ERRCONN" , 41 );
 define ( "ERRMAIL" , 42 );
-//define ( "NO" , 0 );
-//define ( "SI" , 1 );
+define ( "CONN" , 0 );
+define ( "MAIL" , 1 );
 
 define ( "REGOLA_REMOVED", 8);
 define ( "REGOLA_DISCONNECT", 84);
@@ -61,7 +61,7 @@ $DD=$DEBUG;
 $Sistema=array();
 $MAIL=array();
 $CONN=array();
-
+$LINEA=array();
 
 
 
@@ -82,6 +82,21 @@ if( isset( $_GET['leggi']   ) )
   	$NomeFile=$nome_file_all;
   }
 
+
+  if(  $_GET['leggi']  == 'ieri'   )
+  {
+  	system("zcat /var/log/mail.log.1.gz > $nome_file_all");
+  	$NomeFile=$nome_file_all;
+  }
+
+
+  if(  $_GET['leggi']  == 'ierioggi'   )
+  {
+  	system("(zcat /var/log/mail.log.1.gz; cat /var/log/mail.log) > $nome_file_all");
+  	$NomeFile=$nome_file_all;
+  }
+
+
   if(  $_GET['leggi']  == 'oggi'    )
   {
   	$NomeFile='/var/log/mail.log';
@@ -92,7 +107,7 @@ if( isset( $_GET['leggi']   ) )
 
     LEGGI_TUTTO($file);
 
-    //stampa($MAIL);
+    //stampa($LINEA);
 
     AGGANCIA_C_M();
 
@@ -108,6 +123,7 @@ if( isset( $_GET['leggi']   ) )
 
     $_SESSION['MAIL']=$MAIL;
     $_SESSION['CONN']=$CONN;
+    $_SESSION['LINEA']=$LINEA;
     $_SESSION['Sistema']=$Sistema;
 
 
@@ -184,24 +200,26 @@ if(  isset(  $_GET['ALL']  ) )
 
 
 		$nm="";$nc="";
-		foreach($_SESSION['MAIL'] as $M)
+		if( isset ( $_SESSION['LINEA'][$nl][MAIL] ) )
 		{
+			$M=$_SESSION['MAIL'][    $_SESSION['LINEA'][$nl][MAIL]    ];
 			foreach($M->linee as $l )
 			{
-				if( $l->numlinea == $nl ) { $nm .= sprintf(" %4d ", $M->IDX);  $nc .= sprintf(" %4d ", $M->idx_conn);}
+				if( $l->numlinea == $nl ) { $nm .= sprintf(" %4d ", $M->IDX);  $nc .= sprintf(" %4d ", $M->idx_conn); break;}
 			}
 		}
 
 		if( $nm == '' )
 		{
 
-				foreach($_SESSION['CONN'] as $C)
+			if( isset ( $_SESSION['LINEA'][$nl][CONN] )  and isset(    $_SESSION['CONN'][   $_SESSION['LINEA'][$nl][CONN]    ]   ) )
+			{
+				$C=$_SESSION['CONN'][   $_SESSION['LINEA'][$nl][CONN]    ];
+				foreach($C->linee as $l )
 				{
-					foreach($C->linee as $l )
-					{
-						if( $l->numlinea  == $nl ) $nc .= sprintf(" %4d ", $C->IDX);
-					}
+						if( $l->numlinea  == $nl ) { $nc .= sprintf(" %4d ", $C->IDX); break;}
 				}
+			}
 		}
 
 		printf("%5d | %6s | %6s | %s %s\n",  $nl, $nm, $nc, $or[1], $i );
@@ -360,6 +378,8 @@ unset( $_SESSION['stra'] );
 Carica : <br><br>
 <a href="mail.php?leggi=tutto">TUTTI I FILES</a><br><br>
 <a href="mail.php?leggi=oggi">Solo oggi <?php echo $oggi ?></a><br><br>
+<a href="mail.php?leggi=ieri">ieri</a><br><br>
+<a href="mail.php?leggi=ierioggi">ieri e oggi</a><br><br>
 <a href="">Un particolare file</a><br><br>
     <label for="exampleInputFile">File input</label>
     <input type="file" id="exampleInputFile">

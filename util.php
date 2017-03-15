@@ -364,7 +364,7 @@ class mail {
 	var $TO='';
 	var $Subject='';
 	var $userlogin='';
-	var $IN_FILTRO_RICERCA=NO;
+	var $IN_FILTRO_RICERCA=0;
 	var $idx_conn=0;
 
 	var $linee=array();
@@ -452,7 +452,7 @@ class conn
 	var $statusError=NOERR;
 	var $dataini=0;
 	var $dataend=0;
-	var $IN_FILTRO_RICERCA=NO;
+	var $IN_FILTRO_RICERCA=0;
 	var $TO_pseudo='';
 	var $FROM_pseudo='';
 	var $linee=array();
@@ -497,12 +497,15 @@ class conn
 
 function Add(&$obj, $tipo, $x )
 {
-	global $DATA, $out, $numerolineelette, $DEBUG, $re;
+	global $DATA, $out, $numerolineelette, $DEBUG, $re, $LINEA;
 
 	if(0 < $DEBUG AND $DEBUG < 2 ) echo "DEBUG: Dentro Add ID this=".$obj->IDX."\n";
 
 	if( is_array($x) ) $a=$x;
 	else $a=array($x);
+
+	if( get_class($obj)  == 'mail' ) 	$LINEA[$numerolineelette][MAIL]=$obj->IDX;
+	else 								$LINEA[$numerolineelette][CONN]=$obj->IDX;
 
 //	if( !(  get_class($obj)  == 'mail' and  $obj->IDX == 0 	and  $numerolineelette < 100 ) )
 //	{
@@ -668,7 +671,7 @@ function AGGANCIA_C_M()
 			if(  $dim < $c->dataini   )  continue;   // la data ini mail deve arrivare dopo la connect  m>= c  OK
 			if(  $c->dataend !=0 and abs($dem - $c->dataend) > 300  )  continue;   // la differenza asoluta fra chiusura e remove non e' maggiore di 5 minuti...
 
-			//if( $dem + 600 < $c->dataend   ) break;  // ottimizzazione nella ricerca.. se la data di fine mail + 10 minuti non ha trovato alcuna connessione evito di andare oltre .. non ho trovato nulla.
+			if( $dem + 1200 < $c->dataend   ) break;  // ottimizzazione nella ricerca.. se la data di fine mail + 20 minuti non ha trovato alcuna connessione evito di andare oltre .. non ho trovato nulla.
 
 			//le date sono giuste.. controllo gli indirizzi
 
